@@ -44,6 +44,7 @@ import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DAOException;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -100,18 +101,31 @@ public class IngresosActualizacionBean implements Serializable {
     private NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("es", "MX"));
 
     public IngresosActualizacionBean() {
-        listaPago = new ArrayList<Pago>();
-        listaCtes = new ArrayList<Cliente>();
-        listaMedioPago = new ArrayList<>();
-        medioPagoDAO = new MedioPagoDAO();
-        pagoSelected = new Pago();
-        cteSelect = new Cliente();
-        complementoBL = new ComplementoBL();
+        this.listaPago = new ArrayList<Pago>();
+        this.listaCtes = new ArrayList<Cliente>();
+        this.listaMedioPago = new ArrayList<>();
+        this.medioPagoDAO = new MedioPagoDAO();
+        this.pagoSelected = new Pago();
+        this.cteSelect = new Cliente();
+        this.complementoBL = new ComplementoBL();
         this.habilitarComplemento = Boolean.FALSE;
         this.tipoMetodoPago = null;
-        
-        this.startDate = new Date();
-        this.endDate = new Date();
+        this.configuraPeriodo();
+    }
+    
+    public void configuraPeriodo() {
+    	Integer dia = null;
+		this.endDate = new Date();
+		DateUtil.setTime(this.endDate, 23, 59, 59, 999);
+		dia = DateUtil.getDia(this.endDate);
+		
+		if(dia <= 5) {
+			this.startDate = DateUtil.addMonth(this.endDate, -1);
+			this.startDate = DateUtil.getFirstDayOfMonth(this.startDate);
+			DateUtil.setTime(this.startDate, 0, 0, 0, 0);
+		} else {
+			this.startDate = DateUtil.getFirstDayOfMonth(this.endDate);
+		}
     }
 
     @SuppressWarnings("unchecked")
@@ -169,6 +183,9 @@ public class IngresosActualizacionBean implements Serializable {
             	log.info("Deshabilitar el registro de complementos de pago.");
             }
             
+            if(this.emisoresSelected != null && this.cteSelect != null && "PPD".equalsIgnoreCase(this.tipoMetodoPago.trim()))
+            	complementoPago = complementoBL.crear(this.emisoresSelected.getCd_emisor(), this.cteSelect.getCteCve());
+            
             log.info("Se ha filtrado la lista de pagos");
             severity = FacesMessage.SEVERITY_INFO;
             title = "Completado";
@@ -195,6 +212,10 @@ public class IngresosActualizacionBean implements Serializable {
     	String metodoPago = (this.tipoMetodoPago == null || "".equalsIgnoreCase(this.tipoMetodoPago.trim()) ? null : this.tipoMetodoPago);
     	
         this.listaPago = this.pagoDAO.buscar(rfcEmisor, idCliente, this.startDate, this.endDate, metodoPago);
+    }
+    
+    public void crearComplemento() {
+    	
     }
 
     public void cargaInfoPago(Pago pago) {
@@ -393,6 +414,7 @@ public class IngresosActualizacionBean implements Serializable {
     	String title = null;
         String message = null;
         Severity severity = null;
+        
         try {
             if (serieComplementoPago == null) {
                 throw new InventarioException("Debe seleccionar un folio para el complemento de pago.");
@@ -404,6 +426,9 @@ public class IngresosActualizacionBean implements Serializable {
             
             if(pagoSelected.getComplementoPago() != null)
             	throw new InventarioException("El pago ya está asociado a otro complemento.");
+            
+            if(this.pagoSelected.getFormaPago() == null || "".equalsIgnoreCase(this.pagoSelected.getFormaPago().trim()))
+            	throw new InventarioException("Debe indicar la forma de pago.");
 
             boolean existe = listaPagosSeleccionados.stream()
                     .anyMatch(p -> p.getId().equals(pagoSelected.getId()));
@@ -483,13 +508,9 @@ public class IngresosActualizacionBean implements Serializable {
         String mensaje = null;
         Severity severity = null;
         try {
-            if (medioPagoSelect == null) {
-                throw new InventarioException("Debe seleccionar una forma de pago.");
-            }
-            log.info("Forma de pago del cliente {}: {}", this.cteSelect.getNombre(), medioPagoSelect.getFormaPago() + "-" + medioPagoSelect.getMpDescripcion());
             
             if (listaPagosSeleccionados.isEmpty() || listaPagosSeleccionados == null) {
-                log.error("Debe seleccionar por lo menos un pago");
+                log.error("Debe seleccionar al menos un pago");
                 throw new InventarioException("Debe seleccionar al menos un pago.");
             }
 
@@ -497,22 +518,16 @@ public class IngresosActualizacionBean implements Serializable {
                 throw new InventarioException("Debe seleccionar un cliente para generar el complemento de pago.");
             }
             
-            ComplementoPago complementoPago = new ComplementoPago();
-    		complementoPago.setRegistro(new Date());
     		complementoPago.setSerie(serieComplementoPago.getSerie());
     		complementoPago.setNumero(serieComplementoPago.getNumero());
-    		complementoPago.setFormaPago(medioPagoSelect.getFormaPago());
-    		complementoPago.setEmisor(emisoresSelected);
-    		complementoPago.setReceptor(cteSelect);
-            complementoBL.guardarComplementoPago(complementoPago);
-
-            this.complementoPago = complementoBL.obtenerPorFolioSerie(serieComplementoPago.getNumero(), serieComplementoPago.getSerie());
 
             for (Pago pago : listaPagosSeleccionados) {
                 pago.setComplementoPago(complementoPago);
-                pagoDAO.actualizar(pago);
                 log.info("Pago actualizado....");
             }
+            
+            complementoPago.setListPagos(listaPagosSeleccionados);
+            complementoBL.guardarComplementoPago(complementoPago);
 
             habilitarTimbrado = true;
             complementoBL.actualizarSerieComplemento(serieComplementoPago);
@@ -544,7 +559,7 @@ public class IngresosActualizacionBean implements Serializable {
     	return formatter.format(total);
     }
 
-    public synchronized void generarComplemento() {
+    public synchronized void timbrar() {
         String mensaje = null;
         Severity severity = null;
         try {
@@ -579,8 +594,9 @@ public class IngresosActualizacionBean implements Serializable {
             }
 
             log.info("Cantidad de pagos a generar con el complemento de pago: {}", listaPagosSeleccionados.size());
+            
             /*Enviar peticion a facturama*/
-            ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(listaPagosSeleccionados, cteSelect.getCteCve(), emisoresSelected.getCd_emisor(), usuario, medioPagoSelect.getFormaPago());
+            ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(this.complementoPago);
             complementoPagoBL.timbrar();
             complementoPagoBL.sendMail();
 

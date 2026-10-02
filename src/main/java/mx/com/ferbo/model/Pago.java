@@ -9,7 +9,6 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -71,7 +70,7 @@ public class Pago implements Serializable {
     private Bancos banco;
     
     @JoinColumn(name = "factura", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false)
     private Factura factura;
     
     @JoinColumn(name = "tipo", referencedColumnName = "id")
@@ -90,6 +89,37 @@ public class Pago implements Serializable {
     @Column(name = "nu_parcialidad")
     @Size(max = 5)
     private Integer parcialidad;
+    
+    @Override
+    public int hashCode() {
+        if (this.id == null) {
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        final Pago other = (Pago) object;
+        if(this.id == null || other.id == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+       
+        return Objects.equals(this.id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Pago[ id=" + id + " ]";
+    }
 
     public Pago() {
     }
@@ -172,37 +202,6 @@ public class Pago implements Serializable {
 
     public void setParcialidad(Integer parcialidad) {
         this.parcialidad = parcialidad;
-    }
-
-    @Override
-    public int hashCode() {
-        if (this.id == null) {
-            return System.identityHashCode(this);
-        }
-        return Objects.hash(this.id);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null) {
-            return false;
-        }
-        if (getClass() != object.getClass()) {
-            return false;
-        }
-        final Pago other = (Pago) object;
-        if(this.id == null || other.id == null)
-            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
-       
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Pago[ id=" + id + " ]";
     }
 
 	public String getFormaPago() {

@@ -270,7 +270,7 @@ public class Factura implements Serializable {
     @Basic(optional = true)
     private String lugarExpedicion;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.MERGE, CascadeType.REFRESH }, mappedBy = "factura")
     private List<Pago> pagoList;
 
     @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "facturaMedioPagoPK.facturaId")

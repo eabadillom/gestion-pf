@@ -1,6 +1,7 @@
 package mx.com.ferbo.pagos.controller;
 
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,14 +19,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import com.ferbo.facturama.tools.FacturamaException;
+
+import mx.com.ferbo.business.ComplementoPagoBL;
 import mx.com.ferbo.business.complemento.ComplementoBL;
-import mx.com.ferbo.business.n.ClienteBL;
+import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ComplementoPago;
+import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DAOException;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
 
 @Named(value = "consultaCPD")
@@ -41,14 +47,21 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	
 	private Date fechaInicio;
 	private Date fechaFin;
-//	private ClienteBL clientesBO;
-	private Cliente cliente;
+	
+	private Cliente       cliente;
 	private List<Cliente> clientes;
-	private ComplementoBL complementoBO;
-	private ComplementoPago complemento;
+	
+	private      ComplementoBL    complementoBO;
+	private      ComplementoPago  complemento;
 	private List<ComplementoPago> complementos;
-	private PagoDAO pagoDAO;
+	
+	private PagoDAO    pagoDAO;
 	private List<Pago> pagos;
+	private Pago       pago;
+	
+	private List<MedioPago> formasDePago;
+	private MedioPagoDAO    formaPagoDAO;
+	
 	private Date periodoInicio;
 	private Date periodoFin;
 	
@@ -56,22 +69,60 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	
 	@SuppressWarnings("unchecked")
 	public ConsultaComplementoPagoBean() {
-		context = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) context.getExternalContext().getRequest();
-        usuario = (Usuario) request.getSession(false).getAttribute("usuario");
+		this.context  = FacesContext.getCurrentInstance();
+		this.request  = (HttpServletRequest) context.getExternalContext().getRequest();
+        this.usuario  = (Usuario) request.getSession(false).getAttribute("usuario");
         this.clientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
         
 		this.complementoBO = new ComplementoBL();
-		this.complementos = new ArrayList<ComplementoPago>();
-		this.fechaInicio = new Date();
+		this.complementos  = new ArrayList<ComplementoPago>();
+		this.fechaInicio   = new Date();
+		this.fechaFin      = new Date();
+		this.pagoDAO       = new PagoDAO();
+		this.pago          = new Pago();
+		this.formaPagoDAO  = new MedioPagoDAO();
+		this.complemento   = complementoBO.crear();
+		this.formasDePago  = formaPagoDAO.buscarVigentes(new Date());
+		
+		this.configuraPeriodoComplementos();
+		this.configuraPeriodoPagos();
+		this.buscarComplementos();
+		
+		log.info("El usuario {} entra a la consulta de complementos de pago", this.usuario.getUsuario());
+	}
+	
+	public void configuraPeriodoComplementos() {
+		Integer dia = null;
 		this.fechaFin = new Date();
-		this.pagoDAO = new PagoDAO();
-		this.complemento = complementoBO.crear();
+		DateUtil.setTime(this.fechaFin, 23, 59, 59, 999);
+		dia = DateUtil.getDia(this.fechaFin);
+		
+		if(dia <= 5) {
+			this.fechaInicio = DateUtil.addMonth(this.fechaFin, -1);
+			this.fechaInicio = DateUtil.getFirstDayOfMonth(this.fechaInicio);
+			DateUtil.setTime(this.fechaInicio, 0, 0, 0, 0);
+		} else {
+			this.fechaInicio = DateUtil.getFirstDayOfMonth(this.fechaFin);
+		}
+	}
+	
+	public void configuraPeriodoPagos() {
+		Integer dia = null;
+		this.periodoFin = new Date();
+		DateUtil.setTime(this.periodoFin, 23, 59, 59, 999);
+		dia = DateUtil.getDia(this.periodoFin);
+		
+		if(dia <= 5) {
+			this.periodoInicio = DateUtil.addMonth(this.periodoFin, -1);
+			this.periodoInicio = DateUtil.getFirstDayOfMonth(this.periodoInicio);
+			DateUtil.setTime(this.periodoInicio, 0, 0, 0, 0);
+		} else {
+			this.periodoInicio = DateUtil.getFirstDayOfMonth(this.periodoFin);
+		}
 	}
 	
 	@PostConstruct
 	public void init() {
-		//En este método no se debería agregar código, debido a que existe componentes de PrimeFaces que lanzan múltiples invocaciones a este método.
 	}
 	
 	public void buscarComplementos() {
@@ -101,6 +152,16 @@ public class ConsultaComplementoPagoBean implements Serializable {
 		
 	}
 	
+	public Boolean editar() {
+		if(this.complemento == null)
+			return Boolean.FALSE;
+		
+		if(this.complemento.getIdPac() == null)
+			return Boolean.FALSE;
+		
+		return Boolean.TRUE;
+	}
+	
 	public void cargarPagosPendientes() {
 		log.info("Cargando facturas pendientes...");
 		
@@ -119,18 +180,58 @@ public class ConsultaComplementoPagoBean implements Serializable {
 		}
 		
 		return this.pagos.stream()
+				.filter(p -> p.getTipo().getId() != 5) //Elimina los pagos que provienen de Notas de crédito.
 				.filter(p -> this.complemento.getListPagos().contains(p) == false)
 				.collect(Collectors.toList());
 	}
 	
-	public void agregarPagoPendiente(Pago pago) {
-		log.info("Agregando el pago al complemento...");
-		if(this.complemento.getListPagos() == null)
-			this.complemento.setListPagos(new ArrayList<Pago>());
-		
-		pago.setComplementoPago(this.complemento);
-		this.complemento.getListPagos().add(pago);
-		PrimeFaces.current().ajax().update("form:pnl-complemento", "form:pnl-agregar-pago");
+	public void solicitarFormaDePago(Pago pago) {
+		this.pago = pago;
+	}
+	
+	public void agregarPagoPendiente() {
+		String title = null;
+        String message = null;
+        Severity severity = null;
+        
+		try {
+			log.info("Agregando el pago al complemento...");
+			
+			log.info("Parcialidad del pago {}: {}", this.pago, this.pago.getParcialidad());
+			
+			if(this.pago.getParcialidad() == null)
+				complementoBO.configuraParcialidad(this.pago);
+			
+			if(this.pago.getHora() == null)
+				this.pago.setHora(LocalTime.MIDNIGHT);
+			
+			if(this.complemento.getListPagos() == null)
+				this.complemento.setListPagos(new ArrayList<Pago>());
+			
+			this.pago.setComplementoPago(this.complemento);
+			this.complemento.getListPagos().add(pago);
+			
+			
+			PrimeFaces.current().ajax().update("form:pnl-complemento", "form:pnl-agregar-pago");
+			PrimeFaces.current().executeScript("PF('dlgFormaPago').hide()");
+			
+			title = "Pago agregado";
+			message = "Se agregó al complemento de pago";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			log.warn("{}", ex.getMessage());
+			title = "Aviso";
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			log.error("Problema para agregar el pago...", ex);
+			title = "Error";
+			message = "Ocurrió un problema al agregar el pago.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 	
 	public void eliminarPago(Pago pago) {
@@ -140,22 +241,28 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	}
 	
 	public void actualizar() {
-		String title = "Complementos";
+		String title = null;
         String message = null;
         Severity severity = null;
         
         try {
-        	complementoBO.actualizar(this.complemento);
+        	this.complementoBO.actualizar(this.complemento);
+        	
+        	title = "Operación correcta";
+        	message = "Se actualizó su complemento de pago";
+        	severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
+        	log.warn("{}", ex.getMessage());
+        	title = "Aviso";
             message = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
         } catch (Exception ex) {
             log.error("Problema para recuperar los datos del cliente.", ex);
-            message = "Ocurrió un problema para consultar las facturas del cliente.";
+            title = "Error";
+            message = "Ocurrió un problema en la actualización del complemento de pago";
             severity = FacesMessage.SEVERITY_ERROR;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
         } finally {
+        	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
             PrimeFaces.current().ajax().update("form:messages", "form:dt-complementos");
         }
 		
@@ -164,7 +271,41 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	}
 	
 	public void timbrar(ComplementoPago complemento) {
+		String title = null;
+        String message = null;
+        Severity severity = null;
 		
+		ComplementoPago complementoPago;
+		try {
+			log.info("timbrando...");
+			complementoPago = complementoBO.cargar(complemento.getId());
+			
+			ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(complementoPago);
+            complementoPagoBL.timbrar();
+            complementoPagoBL.sendMail();
+            
+            title = "Operación correcta";
+        	message = "Se actualizó su complemento de pago";
+        	severity = FacesMessage.SEVERITY_INFO;
+		} catch(FacturamaException ex) {
+			log.warn("Problema en la comunicación con Facturama: {}", ex.getMessage());
+			title = "Aviso de Facturama";
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (InventarioException ex) {
+			log.warn("{}", ex.getMessage());
+			title = "Aviso";
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema con el timbrado del complemento de pago...", ex);
+			title = "Error";
+			message = "Ocurrió un problema con el timbrado del complemento de pago.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
+            PrimeFaces.current().ajax().update("form:messages", "form:dt-complementos");
+		}
 	}
 
 	public Date getFechaInicio() {
@@ -238,8 +379,20 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	public void setPeriodoFin(Date periodoFin) {
 		this.periodoFin = periodoFin;
 	}
-	
-	
-	
 
+	public List<MedioPago> getFormasDePago() {
+		return formasDePago;
+	}
+
+	public void setFormasDePago(List<MedioPago> formasDePago) {
+		this.formasDePago = formasDePago;
+	}
+
+	public Pago getPago() {
+		return pago;
+	}
+
+	public void setPago(Pago pago) {
+		this.pago = pago;
+	}
 }

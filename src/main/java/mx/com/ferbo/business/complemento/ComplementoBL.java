@@ -4,13 +4,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.ComplementoPagoBL;
 import mx.com.ferbo.dao.PagoDAO;
+import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.n.ComplementoPagoDAO;
+import mx.com.ferbo.dao.n.EmisoresCFDISDAO;
+import mx.com.ferbo.dao.n.FacturaDAO;
 import mx.com.ferbo.dao.n.SerieComplementoPagoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
@@ -27,13 +32,21 @@ public class ComplementoBL {
 	private Logger log = LogManager.getLogger(ComplementoPagoBL.class);
 
 	private PagoDAO pagoDAO;
+	private FacturaDAO facturaDAO;
 	private ComplementoPagoDAO complementoPagoDAO;
 	private SerieComplementoPagoDAO serieComplementoPagoDAO;
-
+	private ClienteDAO clienteDAO;
+	private EmisoresCFDISDAO emisoresDAO;
+	private ClienteDomiciliosDAO domiciliosDAO;
+	
 	public ComplementoBL() {
 		this.pagoDAO = new PagoDAO();
 		this.complementoPagoDAO = new ComplementoPagoDAO();
 		this.serieComplementoPagoDAO = new SerieComplementoPagoDAO();
+		this.facturaDAO = new FacturaDAO();
+		this.clienteDAO = new ClienteDAO();
+		this.emisoresDAO = new EmisoresCFDISDAO();
+		this.domiciliosDAO = new ClienteDomiciliosDAO();
 	}
 	
 	public void actualizar(ComplementoPago pago)
@@ -51,11 +64,75 @@ public class ComplementoBL {
 		return complemento;
 	}
 	
+	public ComplementoPago crear(Integer idEmisor, Integer idReceptor) throws InventarioException {
+    	EmisoresCFDIS emisor = emisoresDAO.buscarPorId(idEmisor).orElseThrow(() -> new InventarioException("El emisor indicado es incorrecto."));
+    	Cliente receptor = clienteDAO.buscarPorId(idReceptor).orElseThrow(() -> new InventarioException("El receptor indicado es incorrecto."));
+    	
+    	ComplementoPago complementoPago = new ComplementoPago();
+		complementoPago.setEmisor(emisor);
+		complementoPago.setReceptor(receptor);
+		complementoPago.setRegistro(new Date());
+		complementoPago.setUsoCFDI(ComplementoPagoBL.USO_CFDI);
+		complementoPago.setLugarExpedicion(emisor.getCodigoPostal());
+		complementoPago.setEmisorNombre(emisor.getNb_emisor());
+		complementoPago.setEmisorRFC(emisor.getNb_rfc());
+		complementoPago.setEmisorRegimenFiscal(emisor.getCd_regimen().getCd_regimen());
+		complementoPago.setReceptorNombre(receptor.getNombre());
+		complementoPago.setReceptorRFC(receptor.getCteRfc());
+		List<ClienteDomicilios> domicilios = domiciliosDAO.buscarPorCliente(receptor.getCteCve());
+		ClienteDomicilios domicilio = domicilios.stream()
+				.filter(d -> d.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve() == 1)
+				.findFirst()
+				.orElseThrow(() -> new InventarioException("El cliente no tiene un domicilio registrado."));
+		
+		complementoPago.setReceptorCodigoPostal(domicilio.getDomicilios().getAsentamiento().getCp());
+		complementoPago.setReceptorRegimenFiscal(receptor.getRegimenFiscal().getCd_regimen());
+		
+		return complementoPago;
+    }
+	
 	public ComplementoPago cargar(Integer id)
 	throws InventarioException {
 		ComplementoPago complemento = null;
-		complemento = complementoPagoDAO.cargar(id).orElseThrow(() -> new InventarioException("No se encontró información del complemento de pago."));
+		complemento = complementoPagoDAO.cargar(id)
+				.orElseThrow(() -> new InventarioException("No se encontró información del complemento de pago."));
 		return complemento;
+	}
+	
+	public void configuraParcialidad(Pago pago)
+	throws InventarioException {
+		Factura factura;
+		List<Pago> pagos;
+		Integer parcialidad;
+		
+		factura = facturaDAO.buscarPorId(pago.getFactura().getId())
+				.orElseThrow(() -> new InventarioException("El pago debe estar asociado a una factura."));
+		
+		if(factura.getPagoList() == null || factura.getPagoList().size() == 0)
+			return;
+		
+		if(factura.getPagoList().size() > 1) {
+			pagos = factura.getPagoList().stream()
+					//Eliminamos de la evaluación los pagos por notas de crédito.
+					.filter(p -> p.getTipo().getId() != 5)
+					//Ordenamos los pagos del más antiguo al más reciente.
+					.sorted((p1, p2) -> p1.getFecha().compareTo(p2.getFecha()))
+					.collect(Collectors.toList());
+		} else {
+			pagos = factura.getPagoList();
+		}
+		
+		parcialidad = 1;
+		
+		for(Pago p : pagos) {
+			p.setParcialidad(parcialidad++);
+		}
+		
+		if(pagos.contains(pago)) {
+			parcialidad = pagos.get(pagos.indexOf(pago)).getParcialidad();
+			pago.setParcialidad(parcialidad);
+		}
+			
 	}
 
 	public List<ComplementoPago> buscarPor(Date fechaInicio, Date fechaFin) {
@@ -119,8 +196,6 @@ public class ComplementoBL {
 			throws InventarioException {
 		if(complemento == null)
 			throw new InventarioException("La información del complemento de pago es incorrecta.");
-		if(complemento.getFormaPago() == null || "".equalsIgnoreCase(complemento.getFormaPago()))
-			throw new InventarioException("Debe indicar la forma de pago del complmeneto.");
 		if(complemento.getEmisor() == null)
 			throw new InventarioException("Debe indicar un emisor para el complemento.");
 		if(complemento.getReceptor() == null)
@@ -132,7 +207,7 @@ public class ComplementoBL {
 		if(complemento.getRegistro() == null)
 			throw new InventarioException("Debe indicar la fecha de registro del complemento de pago");
 		
-		complementoPagoDAO.guardar(complemento);
+		complementoPagoDAO.actualizar(complemento);
 	}
 
 	public ComplementoPago obtenerPorFolioSerie(String numero, String serie) throws DAOException {

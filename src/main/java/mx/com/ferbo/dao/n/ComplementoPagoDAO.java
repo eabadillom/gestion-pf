@@ -34,6 +34,7 @@ public class ComplementoPagoDAO extends BaseDAO<ComplementoPago, Integer> {
 			query = "SELECT cp FROM ComplementoPago cp "
 					+ "INNER JOIN FETCH cp.listPagos p "
 					+ "INNER JOIN FETCH p.factura f "
+					+ "LEFT JOIN FETCH f.cfdi c "
 					+ "INNER JOIN FETCH cp.emisor e "
 					+ "INNER JOIN FETCH cp.receptor r "
 					+ "WHERE cp.id = :id";
