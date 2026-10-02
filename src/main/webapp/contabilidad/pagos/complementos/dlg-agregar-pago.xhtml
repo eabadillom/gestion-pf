@@ -21,16 +21,16 @@
 					</div>
 					<p:spacer style="height: 1rem;" />
 					<p:dataTable value="#{consultaCPD.pagosPendientes()}" var="pago" size="small" rows="5" paginator="true" paginatorPosition="bottom">
+						<p:column headerText="Fecha pago" style="text-align: center;">
+							<p:outputLabel value="#{pago.fecha}">
+								<f:convertDateTime pattern="dd / MMM / yyyy" locale="es_MX" timeZone="GMT-6" />
+							</p:outputLabel>
+						</p:column>
 						<p:column headerText="Factura" style="text-align: center;">
 							<p:outputLabel value="#{pago.factura.nomSerie}-#{pago.factura.numero}"></p:outputLabel>
 						</p:column>
 						<p:column headerText="Fecha factura" style="text-align: center;">
 							<p:outputLabel value="#{pago.factura.fecha}">
-								<f:convertDateTime pattern="dd / MMM / yyyy" locale="es_MX" timeZone="GMT-6" />
-							</p:outputLabel>
-						</p:column>
-						<p:column headerText="Fecha pago" style="text-align: center;">
-							<p:outputLabel value="#{pago.fecha}">
 								<f:convertDateTime pattern="dd / MMM / yyyy" locale="es_MX" timeZone="GMT-6" />
 							</p:outputLabel>
 						</p:column>

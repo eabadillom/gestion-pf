@@ -116,8 +116,11 @@ public class ConsultaComplementoPagoBean implements Serializable {
 			this.periodoInicio = DateUtil.addMonth(this.periodoFin, -1);
 			this.periodoInicio = DateUtil.getFirstDayOfMonth(this.periodoInicio);
 			DateUtil.setTime(this.periodoInicio, 0, 0, 0, 0);
+			this.periodoFin = DateUtil.getLastDayOfMonth(this.periodoInicio);
+			DateUtil.setTime(this.periodoFin, 23, 59, 59, 999);
 		} else {
 			this.periodoInicio = DateUtil.getFirstDayOfMonth(this.periodoFin);
+			this.periodoFin = DateUtil.getLastDayOfMonth(this.periodoFin);
 		}
 	}
 	
@@ -153,10 +156,14 @@ public class ConsultaComplementoPagoBean implements Serializable {
 	}
 	
 	public Boolean editar() {
-		if(this.complemento == null)
+		return editar(this.complemento);
+	}
+	
+	public Boolean editar(ComplementoPago complemento) {
+		if(complemento == null)
 			return Boolean.FALSE;
 		
-		if(this.complemento.getIdPac() == null)
+		if(complemento.getIdPac() == null)
 			return Boolean.FALSE;
 		
 		return Boolean.TRUE;
