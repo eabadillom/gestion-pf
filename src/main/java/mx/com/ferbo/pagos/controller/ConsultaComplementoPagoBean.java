@@ -291,8 +291,8 @@ public class ConsultaComplementoPagoBean implements Serializable {
             complementoPagoBL.timbrar();
             complementoPagoBL.sendMail();
             this.buscarComplementos();
-            title = "Operación correcta";
-        	message = "Se actualizó su complemento de pago";
+            title = "Timbrado correcto";
+        	message = "Documento certificado ante el SAT. En breve recibirá un correo con los archivos del CFDI.";
         	severity = FacesMessage.SEVERITY_INFO;
 		} catch(FacturamaException ex) {
 			log.warn("Problema en la comunicación con Facturama: {}", ex.getMessage());
