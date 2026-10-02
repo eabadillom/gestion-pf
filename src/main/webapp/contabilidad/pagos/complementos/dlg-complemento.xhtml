@@ -4,7 +4,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-			<p:dialog widgetVar="dlgComplemento" header="Complemento de pago" showEffect="fade" modal="true" responsive="true" fitViewport="true" style="width: 90vw; max-width: 60rem;" position="center top">
+			<p:dialog id="dlg-complemento" widgetVar="dlgComplemento" header="Complemento de pago" showEffect="fade" modal="true" responsive="true" fitViewport="true" style="width: 90vw; max-width: 60rem;" position="center top">
 				<p:outputPanel id="pnl-complemento" styleClass="ui-fluid p-grid" >
 					<div class="p-col-12 p-md-12">
 						<p:outputLabel value="EMISOR" style="font-weight: bold;"/>
@@ -105,7 +105,7 @@
 							<p:outputLabel value="Fecha elaboración" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
 						</div>
 						<div>
-							<p:datePicker value="#{consultaCPD.complemento.registro}" showIcon="true" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6">
+							<p:datePicker value="#{consultaCPD.complemento.registro}" showIcon="true" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" disabled="#{consultaCPD.editar()}">
 								<p:ajax process="@this" />
 							</p:datePicker>
 						</div>

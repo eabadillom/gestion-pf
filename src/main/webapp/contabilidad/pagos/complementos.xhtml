@@ -2,6 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:uii="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 	<ui:define name="title">Consulta de complementos de pago</ui:define>
 	<ui:define name="content">
@@ -53,12 +54,15 @@
 				<p:column headerText="Receptor">
 					<p:outputLabel value="#{complemento.receptor.nombre}" />
 				</p:column>
+				<p:column width="1rem;">
+					<i class="#{consultaCPD.editar(complemento) ? 'fas fa-solid fa-award' : ''}" title="Timbrado"/>
+				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-qrcode" title="Timbrar" process="@this" actionListener="#{consultaCPD.timbrar(complemento)}" update="dt-complementos" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="ui-button-secondary" disabled="#{not empty complemento.idPac}">
+					<p:commandButton icon="pi pi-qrcode" title="Timbrar" process="@this" actionListener="#{consultaCPD.timbrar(complemento)}" update="form:dt-complementos" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="ui-button-secondary">
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-bars" process="@this" actionListener="#{consultaCPD.cargaInfo(complemento)}" update="form:pnl-complemento" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); PF('dlgComplemento').show();">
+					<p:commandButton icon="pi pi-bars" process="@this" actionListener="#{consultaCPD.cargaInfo(complemento)}" update="form:dlg-complemento" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); PF('dlgComplemento').show();">
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>
