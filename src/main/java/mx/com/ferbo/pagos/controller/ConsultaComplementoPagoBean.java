@@ -290,7 +290,7 @@ public class ConsultaComplementoPagoBean implements Serializable {
 			ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(complementoPago);
             complementoPagoBL.timbrar();
             complementoPagoBL.sendMail();
-            
+            this.buscarComplementos();
             title = "Operación correcta";
         	message = "Se actualizó su complemento de pago";
         	severity = FacesMessage.SEVERITY_INFO;
