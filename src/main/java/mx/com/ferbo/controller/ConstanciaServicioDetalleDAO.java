@@ -12,6 +12,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class ConstanciaServicioDetalleDAO extends IBaseDAO<ConstanciaServicioDetalle, Integer> {
 	private static Logger log = LogManager.getLogger(ConstanciaServicioDetalleDAO.class);
 	

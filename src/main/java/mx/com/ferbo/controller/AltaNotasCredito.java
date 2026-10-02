@@ -357,8 +357,8 @@ public class AltaNotasCredito implements Serializable{
 				pago.setMonto(ntf.getCantidad());
 				pago.setFecha(notaCredito.getFecha());
 				pago.setReferencia(String.format("Nota Credito No %s", notaCredito.getNumero()));
-				pago.setCheque("");
-				pago.setChequeDevuelto(false);
+				//pago.setCheque("");
+				//pago.setChequeDevuelto(false);
 				
 				factura.getPagoList().add(pago);
 				

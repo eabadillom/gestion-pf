@@ -9,7 +9,8 @@ import javax.faces.context.FacesContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
-import mx.com.ferbo.utils.ToolException;
+import com.ferbo.tools.exception.ToolException;
+
 
 /**
  *
@@ -99,6 +100,10 @@ public final class FacesUtils {
         
             case "XLSX": 
                 contentType = "application/vnd.ms-excel";
+                break;
+            
+            case "XML":
+                contentType = "application/xml";
                 break;
 
             default:
