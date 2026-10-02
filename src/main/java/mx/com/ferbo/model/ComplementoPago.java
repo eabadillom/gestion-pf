@@ -12,7 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,16 +24,11 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "complemento_pago")
-@NamedQueries({
-    @NamedQuery(name = "ComplementoPago.findAll", query = "SELECT cp FROM ComplementoPago cp"),
-    @NamedQuery(name = "ComplementoPago.findById", query = "SELECT cp FROM ComplementoPago cp WHERE cp.id = :id"),
-    @NamedQuery(name = "ComplementoPago.findByRegistro", query = "SELECT cp FROM ComplementoPago cp WHERE cp.registro BETWEEN :inicio AND :fin"),
-    @NamedQuery(name = "ComplementoPago.findByTimbrado", query = "SELECT cp FROM ComplementoPago cp WHERE cp.timbrado BETWEEN :inicio AND :fin"),
-    @NamedQuery(name = "ComplementoPago.findByFolioSerie", query = "SELECT cp FROM ComplementoPago cp WHERE cp.numero = :numero AND cp.serie = :serie"),
-    @NamedQuery(name = "ComplementoPago.findByUUID", query = "SELECT cp FROM ComplementoPago cp WHERE cp.uuid = :uuid")
-})
-public class ComplementoPago implements Serializable
-{
+@NamedQuery(name = "ComplementoPago.findByRegistro", query = "SELECT cp FROM ComplementoPago cp WHERE cp.registro BETWEEN :inicio AND :fin")
+@NamedQuery(name = "ComplementoPago.findByTimbrado", query = "SELECT cp FROM ComplementoPago cp WHERE cp.timbrado BETWEEN :inicio AND :fin")
+@NamedQuery(name = "ComplementoPago.findByFolioSerie", query = "SELECT cp FROM ComplementoPago cp WHERE cp.numero = :numero AND cp.serie = :serie")
+public class ComplementoPago implements Serializable {
+	
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -41,15 +37,19 @@ public class ComplementoPago implements Serializable
     @Column(name = "cd_comp_pago")
     private Integer id;
     
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_emisor", nullable = false)
+    private EmisoresCFDIS emisor;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_receptor", nullable = false)
+    private Cliente receptor;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fh_registro")
     @Temporal(TemporalType.DATE)
     private Date registro;
-    
-    @Column(name = "fh_timbrado")
-    @Temporal(TemporalType.DATE)
-    private Date timbrado;
     
     @Size(max = 5)
     @Column(name = "nb_serie")
@@ -59,13 +59,56 @@ public class ComplementoPago implements Serializable
     @Column(name = "nu_numero")
     private String numero;
     
-    @Column(name = "cd_forma_pago")
-    @Size(max = 20)
-    private String formaPago;
+    @Column(name = "cd_uso_cfdi")
+    @Size(max = 5)
+    @Basic(optional = false)
+    private String usoCFDI;
+    
+    @Column(name = "cd_lugar_exp")
+    @Size(max = 5)
+    private String lugarExpedicion;
+    
+    @Column(name = "nb_emi_nombre")
+    @Size(max = 80)
+    @Basic(optional = false)
+    private String emisorNombre;
+    
+    @Column(name = "cd_emi_rfc")
+    @Size(min = 13, max = 14)
+    @Basic(optional = false)
+    private String emisorRFC;
+    
+    @Column(name = "cd_emi_reg_fiscal")
+    @Size(max = 5)
+    @Basic(optional = false)
+    private String emisorRegimenFiscal;
+    
+    @Column(name = "nb_rec_nombre")
+    @Size(max = 80)
+    @Basic(optional = false)
+    private String receptorNombre;
+    
+    @Column(name = "cd_rec_rfc")
+    @Size(min = 13, max = 14)
+    @Basic(optional = false)
+    private String receptorRFC;
+    
+    @Column(name = "cd_rec_cp")
+    @Size(min = 5, max = 5)
+    private String receptorCodigoPostal;
+    
+    @Column(name = "cd_rec_reg_fiscal")
+    @Size(max = 5)
+    @Basic(optional = false)
+    private String receptorRegimenFiscal;
+    
+    @Column(name = "fh_timbrado")
+    @Temporal(TemporalType.DATE)
+    private Date timbrado;
     
     @Size(max = 25)
     @Column(name = "cd_pac")
-    private String pac;
+    private String idPac;
     
     @Column(name = "cd_uuid")
     @Size(max = 36)
@@ -75,8 +118,38 @@ public class ComplementoPago implements Serializable
     @Size(max = 20)
     private String certificadoSAT;
     
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "complementoPago")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "complementoPago")
     private List<Pago> listPagos;
+    
+    @Override
+    public int hashCode() {
+        if(this.id == null)
+            return System.identityHashCode(this);
+        return Objects.hash(this.id);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+    		return true;
+    	}
+    	if (obj == null) {
+    		return false;
+    	}
+    	if (getClass() != obj.getClass()) {
+    		return false;
+    	}
+    	final ComplementoPago other = (ComplementoPago) obj;
+    	if(this.id == null || other.id == null)
+    		return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+    	
+    	return Objects.equals(this.id, other.id);
+    }
+
+    @Override
+    public String toString() {
+    	return "ComplementoPago[" + "id=" + id + ", registro=" + registro + ", timbrado=" + timbrado + ", serie=" + serie + ", numero=" + numero + ", pac=" + idPac + ", uuid=" + uuid + ", certificadoSAT=" + certificadoSAT + ']';
+    }
 
     public ComplementoPago() {
     }
@@ -121,20 +194,12 @@ public class ComplementoPago implements Serializable
         this.numero = numero;
     }
 
-    public String getFormaPago() {
-        return formaPago;
+    public String getIdPac() {
+        return idPac;
     }
 
-    public void setFormaPago(String formaPago) {
-        this.formaPago = formaPago;
-    }
-
-    public String getPac() {
-        return pac;
-    }
-
-    public void setPac(String pac) {
-        this.pac = pac;
+    public void setIdPac(String idPac) {
+        this.idPac = idPac;
     }
 
     public String getUuid() {
@@ -152,43 +217,101 @@ public class ComplementoPago implements Serializable
     public void setListPagos(List<Pago> listPagos) {
         this.listPagos = listPagos;
     }
-
-    @Override
-    public int hashCode() {
-        if(this.id == null)
-            return System.identityHashCode(this);
-        return Objects.hash(this.id);
-    }
-
+    
     public String getCertificadoSAT() {
-        return certificadoSAT;
+    	return certificadoSAT;
     }
-
+    
     public void setCertificadoSAT(String certificadoSAT) {
-        this.certificadoSAT = certificadoSAT;
+    	this.certificadoSAT = certificadoSAT;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ComplementoPago other = (ComplementoPago) obj;
-        if(this.id == null || other.id == null)
-            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
-       
-        return Objects.equals(this.id, other.id);
-    }
+	public EmisoresCFDIS getEmisor() {
+		return emisor;
+	}
 
-    @Override
-    public String toString() {
-        return "ComplementoPago[" + "id=" + id + ", registro=" + registro + ", timbrado=" + timbrado + ", serie=" + serie + ", numero=" + numero + ", pac=" + pac + ", uuid=" + uuid + ", certificadoSAT=" + certificadoSAT + ']';
-    }
+	public void setEmisor(EmisoresCFDIS emisor) {
+		this.emisor = emisor;
+	}
+
+	public Cliente getReceptor() {
+		return receptor;
+	}
+
+	public void setReceptor(Cliente receptor) {
+		this.receptor = receptor;
+	}
+
+	public String getLugarExpedicion() {
+		return lugarExpedicion;
+	}
+
+	public void setLugarExpedicion(String lugarExpedicion) {
+		this.lugarExpedicion = lugarExpedicion;
+	}
+
+	public String getEmisorNombre() {
+		return emisorNombre;
+	}
+
+	public void setEmisorNombre(String emisorNombre) {
+		this.emisorNombre = emisorNombre;
+	}
+
+	public String getEmisorRFC() {
+		return emisorRFC;
+	}
+
+	public void setEmisorRFC(String emisorRFC) {
+		this.emisorRFC = emisorRFC;
+	}
+
+	public String getEmisorRegimenFiscal() {
+		return emisorRegimenFiscal;
+	}
+
+	public void setEmisorRegimenFiscal(String emisorRegimenFiscal) {
+		this.emisorRegimenFiscal = emisorRegimenFiscal;
+	}
+
+	public String getReceptorNombre() {
+		return receptorNombre;
+	}
+
+	public void setReceptorNombre(String receptorNombre) {
+		this.receptorNombre = receptorNombre;
+	}
+
+	public String getReceptorRFC() {
+		return receptorRFC;
+	}
+
+	public void setReceptorRFC(String receptorRFC) {
+		this.receptorRFC = receptorRFC;
+	}
+
+	public String getReceptorRegimenFiscal() {
+		return receptorRegimenFiscal;
+	}
+
+	public void setReceptorRegimenFiscal(String receptorRegimenFiscal) {
+		this.receptorRegimenFiscal = receptorRegimenFiscal;
+	}
+
+	public String getUsoCFDI() {
+		return usoCFDI;
+	}
+
+	public void setUsoCFDI(String usoCFDI) {
+		this.usoCFDI = usoCFDI;
+	}
+
+	public String getReceptorCodigoPostal() {
+		return receptorCodigoPostal;
+	}
+
+	public void setReceptorCodigoPostal(String receptorCodigoPostal) {
+		this.receptorCodigoPostal = receptorCodigoPostal;
+	}
     
 }

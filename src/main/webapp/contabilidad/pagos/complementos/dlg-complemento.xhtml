@@ -1,0 +1,165 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:dialog widgetVar="dlgComplemento" header="Complemento de pago" showEffect="fade" modal="true" responsive="true" fitViewport="true" style="width: 90vw; max-width: 60rem;" position="center top">
+				<p:outputPanel id="pnl-complemento" styleClass="ui-fluid p-grid" >
+					<div class="p-col-12 p-md-12">
+						<p:outputLabel value="EMISOR" style="font-weight: bold;"/>
+					</div>
+					<div class="p-col-6 p-md-6">
+						<div>
+							<p:outputLabel value="Nombre" styleClass="ui-custom-title-small" />
+						</div>
+						<div class="ui-custom-data">
+							<p:outputLabel value="#{consultaCPD.complemento.emisorNombre}" />
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="RFC" styleClass="ui-custom-title-small"/>
+						</div>
+						<div class="ui-custom-data">
+							<p:outputLabel value="#{consultaCPD.complemento.emisorRFC}" />
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Régimen fiscal" styleClass="ui-custom-title-small"/>
+						</div>
+						<div class="ui-custom-data">
+							<p:outputLabel value="#{consultaCPD.complemento.emisorRegimenFiscal}" />
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<p:outputLabel value=""></p:outputLabel>
+					</div>
+					<div class="p-col-12 p-md-12">
+						<p:outputLabel value="RECEPTOR" style="font-weight: bold;"/>
+					</div>
+					<div class="p-col-6 p-md-6">
+						<div>
+							<p:outputLabel value="Nombre" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.receptorNombre}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="RFC" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.receptorRFC}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Régimen fiscal" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.receptorRegimenFiscal}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Código postal" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.receptorCodigoPostal}"></p:outputLabel>
+						</div>
+					</div>
+					
+					<div class="p-col-12 p-md-12">
+						<p:outputLabel value="DATOS GENERALES" style="font-weight: bold;"/>
+					</div>
+					
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Serie" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.serie}-#{consultaCPD.complemento.numero}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Uso del CFDI" style="font-size: 0.8rem; font-weight: bold; color: #495057;"/>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.usoCFDI}" />
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Lugar de expedición" style="font-size: 0.8rem; font-weight: bold; color: #495057;"/>
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+							<p:outputLabel value="#{consultaCPD.complemento.lugarExpedicion}" />
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Fecha elaboración" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+						</div>
+						<div>
+							<p:datePicker value="#{consultaCPD.complemento.registro}" showIcon="true" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6">
+								<p:ajax process="@this" />
+							</p:datePicker>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-2">
+					</div>
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="." style="font-size: 0.8rem; font-weight: bold; color: rgba(255, 255, 255, 0);" />
+						</div>
+						<div>
+							<p:focus for="form:cmd-add-pago"/>
+							<p:commandButton id="cmd-add-pago" icon="pi pi-plus" value="Pago" process="@this" actionListener="#{consultaCPD.cargarPagosPendientes()}" update="form:pnl-agregar-pago" disabled="#{consultaCPD.editar()}" onstart="PF('statusInfoDialog').show();"  oncomplete="PF('statusInfoDialog').hide();PF('dlgAgregarPago').show();" />
+						</div>
+					</div>
+					<p:spacer style="height: 1rem;" />
+					<p:dataTable value="#{consultaCPD.complemento.listPagos}" var="pago" size="small" rows="5" paginator="true" paginatorPosition="bottom">
+						<p:column headerText="Fecha de pago" style="text-align: center;">
+							<p:outputLabel value="#{pago.fecha}">
+								<f:convertDateTime locale="es_MX" pattern="dd / MMM / yyyy" timeZone="GMT-6"></f:convertDateTime>
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Forma de pago" style="text-align: center;">
+							<p:outputLabel value="#{pago.formaPago}" />
+						</p:column>
+						<p:column headerText="Parcialidad" style="text-align: center;">
+							<p:outputLabel value="#{pago.parcialidad}"></p:outputLabel>
+						</p:column>
+						<p:column headerText="Importe" style="text-align: right;">
+							<p:outputLabel value="#{pago.monto}">
+								<f:convertNumber type="currency" currencySymbol="$" locale="es_MX" />
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Factura" style="text-align: center;">
+							<p:outputLabel value="#{pago.factura.nomSerie} - #{pago.factura.numero}"></p:outputLabel>
+						</p:column>
+						<p:column headerText="Fecha factura" style="text-align: center;">
+							<p:outputLabel value="#{pago.factura.fecha}">
+								<f:convertDateTime locale="es_MX" pattern="dd / MMM / yyyy"></f:convertDateTime>
+							</p:outputLabel>
+						</p:column>
+						<p:column width="2rem">
+							<p:commandButton icon="pi pi-times" styleClass="ui-button-outlined ui-button-danger" process="@this" actionListener="#{consultaCPD.eliminarPago(pago)}" update="form:pnl-complemento" disabled="#{consultaCPD.editar()}">
+								<p:confirm header="Eliminar pago del complemento" message="¿Está seguro que desea ELIMINAR el pago del complemento?" icon="pi pi-exclamation-triangle" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton icon="pi pi-save" value="Actualizar" process="@this" actionListener="#{consultaCPD.actualizar()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" disabled="#{consultaCPD.editar()}">
+						<p:confirm header="Actualizar complemento" message="¿Está seguro que desea actualizar el complemento?" icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:commandButton icon="pi pi-times" value="Cerrar" styleClass="ui-button-secondary" onclick="PF('dlgComplemento').hide();"></p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+</ui:composition>
