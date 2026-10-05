@@ -257,7 +257,7 @@ public class ConsultaOrdenSalidaBean implements Serializable {
             log.info("Hora salida: {}", horaSalida);
             log.info("Hora limite: {}", horaLimite);
 
-            if (horaSalida.isBefore(horaLimite)) {
+            if (horaSalida.isAfter(horaLimite)) {
                 isHorarioNoLaboral = new Boolean(true);
             }
 
