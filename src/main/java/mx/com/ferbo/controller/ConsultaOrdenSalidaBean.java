@@ -257,7 +257,7 @@ public class ConsultaOrdenSalidaBean implements Serializable {
             log.info("Hora salida: {}", horaSalida);
             log.info("Hora limite: {}", horaLimite);
 
-            if (horaSalida.isBefore(horaLimite)) {
+            if (horaSalida.isAfter(horaLimite)) {
                 isHorarioNoLaboral = new Boolean(true);
             }
 
@@ -281,6 +281,7 @@ public class ConsultaOrdenSalidaBean implements Serializable {
             mensaje = "Error interno del sistema. Intente nuevamente. Si el problema persiste, contacte al soporte del sistema.";
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo, mensaje);
         } finally {
+        	EntityManagerUtil.close(conn);
             actualizarMensajes();
         }
 
