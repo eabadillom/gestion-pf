@@ -32,7 +32,11 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Salida.findById", query = "SELECT s FROM Salida s WHERE s.idSalida = :idStatus"),
     @NamedQuery(name = "Salida.findByFolioSalida", query = "SELECT s FROM Salida s WHERE s.folioSalida = :folioSalida"),
     @NamedQuery(name = "Salida.findByCliente", query = "SELECT s FROM Salida s INNER JOIN s.status st INNER JOIN s.cliente cl WHERE cl.cteCve = :idCliente AND st.clave = :clave AND s.fechaSalida = :fechaSalida"),
-    @NamedQuery(name = "Salida.findByParametros", query = "SELECT s FROM Salida s INNER JOIN s.status st INNER JOIN s.cliente cl WHERE st.clave = :clave AND s.fechaSalida = :fechaSalida AND cl.cteCve = :idCliente")
+    @NamedQuery(name = "Salida.findByParametros", query = "SELECT s FROM Salida s INNER JOIN s.status st INNER JOIN s.cliente cl WHERE st.clave = :clave AND s.fechaSalida = :fechaSalida AND cl.cteCve = :idCliente"),
+    @NamedQuery(name = "Salida.findByClienteYPeriodo", query = "SELECT s FROM Salida s "
+                + "WHERE (:fechaInicio IS NULL OR s.fechaSalida >= :fechaInicio) " 
+                + "AND (:fechaFin IS NULL OR s.fechaSalida  <= :fechaFin) " 
+                + "AND (:idCliente IS NULL OR s.cliente.cteCve = :idCliente)") 
 })
 public class Salida implements Serializable
 {
