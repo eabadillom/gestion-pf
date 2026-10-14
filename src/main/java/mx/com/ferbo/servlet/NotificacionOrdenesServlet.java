@@ -3,8 +3,7 @@ package mx.com.ferbo.servlet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,6 +21,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 
+import mx.com.ferbo.business.NotificacionBL;
 import mx.com.ferbo.dto.NotificacionDTO;
 import mx.com.ferbo.util.SistemaOrigen;
 import mx.com.ferbo.util.StatusNotificacion;
@@ -33,7 +33,10 @@ import org.apache.logging.log4j.Logger;
 @WebServlet ("/notificacion-ordenes")
 public class NotificacionOrdenesServlet extends HttpServlet {
     
-    private static final Logger log = LogManager.getLogger("NotificacionOrdenesServlet");
+    private static final Logger log = LogManager.getLogger(NotificacionOrdenesServlet.class);
+
+    @Inject 
+    NotificacionBL notificacionBL;
 
     private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
             new JsonDeserializer<LocalDateTime>() {
@@ -60,7 +63,7 @@ public class NotificacionOrdenesServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-     //gson = new Gson();
+
     }
 
     @Override 
@@ -73,8 +76,6 @@ public class NotificacionOrdenesServlet extends HttpServlet {
         }
 
         NotificacionDTO notificacion = null;
-        
-        
 
         try (BufferedReader reader = request.getReader()) {
             notificacion = gson.fromJson(reader, NotificacionDTO.class);
@@ -108,16 +109,9 @@ public class NotificacionOrdenesServlet extends HttpServlet {
             return;
         }
 
-        // Aquí debe ir la lógica que disparare la actualización de los componentes que notifican al almacenista
         NotificacionWS.broadcast(gson.toJson(notificacion));
         
-        // Se manda acuse de recibido
-        NotificacionDTO acuseRecibido = new NotificacionDTO();
-        acuseRecibido.setSistemaOrigen(SistemaOrigen.GESTION_PF);
-        acuseRecibido.setStatus(StatusNotificacion.RECIVIDA);
-        acuseRecibido.setTipo(notificacion.getTipo());
-        LocalDateTime cdmxDateTime = LocalDateTime.now(ZoneId.of("America/Mexico_City"));
-        acuseRecibido.setFecha(cdmxDateTime);
+        NotificacionDTO acuseRecibido = notificacionBL.obtenerRespuesta(notificacion.getTipo());
 
         String acuseRecibidoString = gson.toJson(acuseRecibido);
 
@@ -130,6 +124,6 @@ public class NotificacionOrdenesServlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        //gson = null;
+
     }
 }
