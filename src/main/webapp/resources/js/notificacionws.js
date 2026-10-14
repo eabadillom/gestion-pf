@@ -7,7 +7,6 @@
     const maxReconnectDelay = 30000;
     
     function getContextPath() {
-    // Retorna el primer segmento de la ruta (ej: /mi-app)
         return window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
     }
 
@@ -37,7 +36,6 @@
                 return;
             }
 
-            // Distribuye el evento a la lógica de la aplicación.
             document.dispatchEvent(
                 new CustomEvent("websocket-message", {
                     detail: mensaje
@@ -65,7 +63,6 @@
         };
     }
 
-    // Permite que otros scripts escuchen los mensajes.
     window.WebSocketClient = {
         connect: connect
     };
