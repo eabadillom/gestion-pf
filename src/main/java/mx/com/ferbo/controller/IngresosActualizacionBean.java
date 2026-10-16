@@ -152,6 +152,14 @@ public class IngresosActualizacionBean implements Serializable {
         statusPagada = sfDAO.buscarPorId(StatusFactura.STATUS_PAGADA);
         statusPagoParcial = sfDAO.buscarPorId(StatusFactura.STATUS_PAGO_PARCIAL);
     }
+    
+    public Boolean editDisabled() {
+    	if(this.pagoSelected.getComplementoPago() == null)
+    		return Boolean.FALSE;
+    	if(this.pagoSelected.getComplementoPago().getIdPac() == null)
+    		return Boolean.FALSE;
+    	return Boolean.TRUE;
+    }
 
     public void filtraPagos() {
         String messages = null;
@@ -223,13 +231,10 @@ public class IngresosActualizacionBean implements Serializable {
         Severity severity = null;
         try {
             pagoSelected = pago;
-            severity = FacesMessage.SEVERITY_INFO;
-            messages = "Se seleccionó correctamente el pago";
         } catch (Exception ex) {
             log.error("Ocurrió un problema al seleccionar el pago...", ex);
             severity = FacesMessage.SEVERITY_ERROR;
             messages = "Error al seleccionar el pago";
-        } finally {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", messages));
             PrimeFaces.current().ajax().update("form:messages");
         }
@@ -275,6 +280,7 @@ public class IngresosActualizacionBean implements Serializable {
     }
 
     public void updatePago() {
+    	String title = null;
         String messages = null;
         Severity severity = null;
 
@@ -288,7 +294,7 @@ public class IngresosActualizacionBean implements Serializable {
             log.debug("Pago: {}", pagoSelected);
 
             if (pagoSelected.getComplementoPago().getUuid() != null) {
-                throw new InventarioException("Ya no se puede modificar el pago, ya tiene asociado un complemento de pago.");
+                throw new InventarioException("No es posible modificar el pago porque ya timbrado con un complemento de pago.");
             }
 
             respuesta = pagoDAO.actualizar(pagoSelected);
@@ -318,22 +324,26 @@ public class IngresosActualizacionBean implements Serializable {
             facturaDAO.actualizaStatus(factura);
 
             consultaListaPagos();
-
+            log.info("HOLA MUNDO");
             severity = FacesMessage.SEVERITY_INFO;
             messages = "Se actualizó correctamente.";
-
+            title = "Pago actualizado";
+            PrimeFaces.current().executeScript("PF('informacionPagoDialogAct').hide()");
         } catch (InventarioException ex) {
-            log.error("Ocurrió un problema al actualizar el pago...", ex);
-            severity = FacesMessage.SEVERITY_ERROR;
+            log.warn("Ocurrió un problema al actualizar el pago...", ex.getMessage());
+            title = "Aviso";
+            severity = FacesMessage.SEVERITY_WARN;
             messages = ex.getMessage();
         } catch (Exception ex) {
             log.error("Ocurrió un problema al actualizar el pago...", ex);
+            title = "Error";
             severity = FacesMessage.SEVERITY_ERROR;
             messages = "Error al actualizar pago";
+        } finally {
+        	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, messages));
+        	PrimeFaces.current().ajax().update("form:messages", "dt-pagos", "pnlComplementoPago", "dtComplementoPago");
         }
 
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Pago", messages));
-        PrimeFaces.current().ajax().update("form:messages", "dt-pagos", "pnlComplementoPago", "dtComplementoPago");
     }
 
     public void deletePago() {
@@ -393,7 +403,7 @@ public class IngresosActualizacionBean implements Serializable {
             mensaje = "Se eliminado correctamente";
             severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
-            log.error("Ocurrió un problema al eliminar el pago...", ex);
+            log.warn("Ocurrió un problema al eliminar el pago...", ex.getMessage());
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
         } catch (Exception ex) {
@@ -536,7 +546,7 @@ public class IngresosActualizacionBean implements Serializable {
             severity = FacesMessage.SEVERITY_INFO;
             log.info(mensaje);
         } catch (InventarioException ex) {
-            log.error("Ocurrió un problema para generar el complemento de pago...", ex);
+            log.warn("Ocurrió un problema para generar el complemento de pago...", ex.getMessage());
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
         } catch (Exception ex) {
@@ -604,7 +614,7 @@ public class IngresosActualizacionBean implements Serializable {
             mensaje = "El timbrado se ha hecho correctamente";
             severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
-            log.error("Ocurrió un problema para generar el complemento de pago...", ex);
+            log.warn("Ocurrió un problema para generar el complemento de pago...", ex.getMessage());
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
         } catch (Exception ex) {
