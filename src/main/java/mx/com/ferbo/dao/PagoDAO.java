@@ -193,7 +193,7 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
         
 		try {
 			query = "SELECT p FROM Pago p INNER JOIN FETCH p.factura f LEFT JOIN FETCH p.complementoPago cp "
-					+ "WHERE p.complementoPago IS NULL AND (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) "
+					+ "WHERE (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) "
 					+ "AND (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) "
 					+ "AND (p.factura.metodoPago = :metodoPago OR :metodoPago IS NULL) "
 					+ "AND (p.fecha BETWEEN :startDate AND :endDate)";
