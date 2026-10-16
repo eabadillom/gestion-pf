@@ -39,7 +39,9 @@
 					 	 <p:toolbar>
 							<p:toolbarGroup>
 					  		 <div class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton value=".pdf" actionListener="#{reporteIngresosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+								<p:commandButton value=".pdf" actionListener="#{reporteIngresosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+									<p:fileDownload value="#{reporteIngresosBean.file}" />
+								</p:commandButton>  
 						 	 </div>
 							         
 					         <div class="col-2">
@@ -48,7 +50,9 @@
 					         </div>
 							        
 							 <div class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton value=".xlsx"  actionListener="#{reporteIngresosBean.exportarExcel}" action="#{reporteIngresosBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+								<p:commandButton value=".xlsx"  actionListener="#{reporteIngresosBean.exportarExcel}" action="#{reporteIngresosBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+									<p:fileDownload value="#{reporteIngresosBean.file}" />
+								</p:commandButton>  
 				     		 </div>
 							</p:toolbarGroup>
 

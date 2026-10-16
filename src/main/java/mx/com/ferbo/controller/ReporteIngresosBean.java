@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -22,11 +21,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.StreamedContent;
+
+import com.ferbo.gestion.reports.jasper.ingresos.IngresosJR;
 
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 
@@ -52,6 +55,7 @@ public class ReporteIngresosBean implements Serializable {
 	
 	private FacesContext faceContext;
     private HttpServletRequest request;
+    private StreamedContent file;
 	
 	public ReporteIngresosBean() {
 		
@@ -81,54 +85,25 @@ public class ReporteIngresosBean implements Serializable {
 		maxDate = new Date(today.getTime() );
 	}
 	
-public void exportarPdf() {
-		
-		log.info("exṕrtando a PDF");
-		String jasperPath = "/jasper/Ingresos.jrxml";
-		String filename = "reporteIngresos"+fechaActual+".pdf";
-		String images = "/images/logo.jpeg";
-		String message = null;
-		Severity severity = null;
-		File reportFile = new File(jasperPath);
-		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
+	public void exportarPdf() {
+		String message;
+		Severity severity;
+		log.info("exportando a PDF");
 		Connection connection = null;
-		parameters = new HashMap<String, Object>();
+		byte[] bytes;
+
+		final String images = "/images/logoF.png";
+		String filename = "reporteIngresos" + fechaActual + ".pdf";
 		
 		try {
-		
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			reportFile = new File(file);
-			imgfile = new File(img);
-			log.info(reportFile.getPath());
-		
-			Integer clienteCve = null;
-			Integer idBanco = null;
-			if(clienteSelect == null) {
-				clienteCve = null;
-			}else {
-				clienteCve = clienteSelect.getCteCve();
-			}
+			Integer clienteCve = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
+			Integer idBanco = this.bancoSelect == null ? null : this.bancoSelect.getId();
 			
-			if(bancoSelect == null) {
-				idBanco = null;
-			}else {
-				idBanco = bancoSelect.getId();
-			}
-		
 			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente",clienteCve );
-			parameters.put("idBanco", idBanco);
-			parameters.put("fechaInicio", fechaInicio);
-			parameters.put("fechaFin", fechaFin);
-			parameters.put("Imagen", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			IngresosJR jasper = new IngresosJR(connection, images);
+			bytes = jasper.getPDF(fechaInicio, fechaFin, clienteCve, idBanco);
+			
+			this.file = FacesUtils.toPDF(bytes, filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -138,63 +113,27 @@ public void exportarPdf() {
 		} finally {
 			conexion.close((Connection) connection);
 		}
-		
-		
-		
 	}
 	
-	public void sleep() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(5);
-    }
-	
 	public void exportarExcel() {
-		
-		log.info("exṕrtando a PDF");
-		String jasperPath = "/jasper/Ingresos.jrxml";
-		String filename = "reporteIngresos"+fechaActual+".xlsx";
-		String images = "/images/logo.jpeg";
-		String message = null;
-		Severity severity = null;
-		File reportFile = new File(jasperPath);
-		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
+		String message;
+		Severity severity;
+		log.info("exportando a XLSX");
 		Connection connection = null;
-		parameters = new HashMap<String, Object>();
+		byte[] bytes;
+
+		final String images = "/images/logoF.png";
+		String filename = "reporteIngresos" + fechaActual + ".xlsx";
 		
 		try {
-		
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			reportFile = new File(file);
-			imgfile = new File(img);
-			log.info(reportFile.getPath());
-		
-			Integer clienteCve = null;
-			Integer idBanco = null;
-			if(clienteSelect == null) {
-				clienteCve = null;
-			}else {
-				clienteCve = clienteSelect.getCteCve();
-			}
+			Integer clienteCve = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
+			Integer idBanco = this.bancoSelect == null ? null : this.bancoSelect.getId();
 			
-			if(bancoSelect == null) {
-				idBanco = null;
-			}else {
-				idBanco = bancoSelect.getId();
-			}
-		
 			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente",clienteCve );
-			parameters.put("idBanco", idBanco);
-			parameters.put("fechaInicio", fechaInicio);
-			parameters.put("fechaFin", fechaFin);
-			parameters.put("Imagen", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
+			IngresosJR jasper = new IngresosJR(connection, images);
+			bytes = jasper.getXLSX(fechaInicio, fechaFin, clienteCve, idBanco);
+			
+			this.file = FacesUtils.toXLSX(bytes, filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -204,7 +143,6 @@ public void exportarPdf() {
 		} finally {
 			conexion.close((Connection) connection);
 		}
-		
 	}
 
 	public Date getFechaInicio() {
@@ -269,6 +207,14 @@ public void exportarPdf() {
 
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 
 	
