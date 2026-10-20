@@ -16,12 +16,19 @@
 		<h:outputScript name="js/prism.js" library="omega-layout" />
 		<h:outputScript library="js" name="calendar_es.js" />
                 <h:outputScript library="js" name="prevent-double-click.js" />
-		<link rel="icon" type="image/x-icon" href="#{request.contextPath}/favicon.ico" />
+		<h:outputScript library="js" name="notificacionws.js" target="head"/>
+				<link rel="icon" type="image/x-icon" href="#{request.contextPath}/favicon.ico" />
 		<ui:insert name="head" />
 	</h:head>
 
 	<h:body styleClass="#{guestPreferences.menuMode} #{guestPreferences.inputStyleClass}">
 		<div class="wrapper #{guestPreferences.menuColor eq 'light' ? 'layout-light' : ''}">
+                    <p:remoteCommand
+                        name="actualizarNotificaciones"
+                        action="#{sideBarBean.cargaOrdenesDeSalida()}"
+                        process="@this"
+                        update="menuform:frb_orden_retiro topbarForm:tbOrdenesSalida"
+                        global="false"/>
 			<ui:include src="topbar.xhtml" />
 			<ui:include src="sidebar.xhtml" />
 			<ui:include src="./config.xhtml" />
