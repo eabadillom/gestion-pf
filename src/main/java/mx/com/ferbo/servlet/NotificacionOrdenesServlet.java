@@ -2,13 +2,17 @@ package mx.com.ferbo.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import javax.inject.Inject;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,7 +23,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import java.lang.reflect.Type;
 
 import mx.com.ferbo.business.NotificacionBL;
 import mx.com.ferbo.dto.NotificacionDTO;
@@ -27,16 +30,15 @@ import mx.com.ferbo.util.SistemaOrigen;
 import mx.com.ferbo.util.StatusNotificacion;
 import mx.com.ferbo.util.TipoNotificacion;
 import mx.com.ferbo.websocket.NotificacionWS;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @WebServlet ("/notificacion-ordenes")
 public class NotificacionOrdenesServlet extends HttpServlet {
     
+    private static final long serialVersionUID = 972070702422584418L;
+
     private static final Logger log = LogManager.getLogger(NotificacionOrdenesServlet.class);
 
-    @Inject 
-    NotificacionBL notificacionBL;
+    NotificacionBL notificacionBL;	
 
     private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
             new JsonDeserializer<LocalDateTime>() {
@@ -104,14 +106,14 @@ public class NotificacionOrdenesServlet extends HttpServlet {
             return;
         }
 
-        if (StatusNotificacion.RECIVIDA.equals(notificacion.getStatus())) {
+        if (StatusNotificacion.RECIBIDA.equals(notificacion.getStatus())) {
             response.sendError(HttpServletResponse.SC_CONFLICT, "La notificación no puede cambiar de status por que se encuentra como recibida");
             return;
         }
 
         NotificacionWS.broadcast(gson.toJson(notificacion));
         
-        NotificacionDTO acuseRecibido = notificacionBL.obtenerRespuesta(notificacion.getTipo());
+        NotificacionDTO acuseRecibido = new NotificacionBL().obtenerRespuesta(notificacion.getTipo());
 
         String acuseRecibidoString = gson.toJson(acuseRecibido);
 
