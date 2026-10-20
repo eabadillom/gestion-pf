@@ -23,7 +23,7 @@
 	        		</p:commandLink>
 		        </span>
 	        	<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-		       		<p:commandLink action="#{sideBarBean.redirectOrdenesSalida()}" title="Ordenes de retiro pendientes">
+		       		<p:commandLink id="tbOrdenesSalida" action="#{sideBarBean.redirectOrdenesSalida()}" title="Ordenes de retiro pendientes">
 				       	<p:badge id="numeroSalidas" value="#{sideBarBean.numeroSalidas}" severity="#{sideBarBean.severity}" rendered="#{sideBarBean.numeroSalidas != null}" >
 				       		<i class="pi pi-sign-out" style="font-size: 1.5rem"/>
 				       	</p:badge>
