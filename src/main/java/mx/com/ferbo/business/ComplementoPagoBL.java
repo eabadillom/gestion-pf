@@ -1,5 +1,6 @@
 package mx.com.ferbo.business;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.cfdi.exporters.CFDIv40JR;
 import com.ferbo.facturama.business.CfdiBL;
 import com.ferbo.facturama.request.CFDIInfo;
 import com.ferbo.facturama.request.Complement;
@@ -22,6 +24,8 @@ import com.ferbo.facturama.response.CfdiInfoModel;
 import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
 import com.ferbo.mail.beans.Adjunto;
+import com.ferbo.tools.io.FSTools;
+import com.ferbo.tools.io.IOTools;
 
 import mx.com.ferbo.business.complemento.ComplementoBL;
 import mx.com.ferbo.dao.n.ComplementoPagoDAO;
@@ -36,13 +40,13 @@ public class ComplementoPagoBL
 {
     private Logger log = LogManager.getLogger(ComplementoPagoBL.class);
     
-    public static final Integer NAME_ID = 14;
-    public static final String  TIPO_CFDI = "P";
-    public static final String  USO_CFDI = "CP01";
-    public static final String  CURRENCY = "MXN";
+    public static final Integer NAME_ID        = 14;
+    public static final String  TIPO_CFDI      = "P";
+    public static final String  USO_CFDI       = "CP01";
+    public static final String  CURRENCY       = "MXN";
     public static final String  PAYMENT_METHOD = "PPD";
-    public static final String  TAX_NAME = "IVA";
-    public static final String  TAX_OBJECT = "02";
+    public static final String  TAX_NAME       = "IVA";
+    public static final String  TAX_OBJECT     = "02";
     
     private ComplementoPago complementoPago;
     private ComplementoPagoDAO complementoPagoDAO;
@@ -69,6 +73,11 @@ public class ComplementoPagoBL
     
     public void timbrar() throws InventarioException, FacturamaException {
     	CFDIInfo cfdi = new CFDIInfo();
+    	
+    	if(complementoPago.getIdPac() != null) {
+    		log.warn("El complemento de pago {}-{} ya se encuentra timbrado.", complementoPago.getSerie(), complementoPago.getNumero());
+    		return;
+    	}
     	
     	cfdi.setCfdiType(TIPO_CFDI);
         cfdi.setNameId(NAME_ID); 
@@ -173,109 +182,6 @@ public class ComplementoPagoBL
     	return tax;
     }
     
-//    @Deprecated
-//    public void timbrar() throws InventarioException, DAOException, JsonProcessingException, FacturamaException {
-//        CFDIInfo cfdi = new CFDIInfo();
-//        
-//        complementoPagoBL = new ComplementoBL();
-//        
-//        Cliente cliente = clienteDAO.obtenerPorId(idReceptor, true);
-//        EmisoresCFDIS emisor = emisoresDAO.buscarPorId(idEmisor).orElseThrow(() -> new InventarioException("Emisor no encontrado."));
-//        
-//        complementoPago = listPagos.stream()
-//            .map(Pago::getComplementoPago)
-//            .filter(Objects::nonNull)
-//            .findFirst()
-//            .orElse(null);
-//        
-//        if(complementoPago == null) 
-//            throw new InventarioException("El folio y serie del complemento de pago no estan asignados.");
-//        
-//        cfdi.setCfdiType(TIPO_CFDI);
-//        cfdi.setNameId(NAME_ID); 
-//        cfdi.setFolio(complementoPago.getNumero());
-//        cfdi.setSerie(complementoPago.getSerie());
-//        cfdi.setExpeditionPlace(emisor.getCodigoPostal());
-//        
-//        IssuerBindingModel issuerBindingModel = new IssuerBindingModel();
-//        issuerBindingModel.setRfc(emisor.getNb_rfc());
-//        issuerBindingModel.setName(emisor.getNb_emisor());
-//        issuerBindingModel.setFiscalRegime(emisor.getCd_regimen().getCd_regimen());
-//        cfdi.setIssuer(issuerBindingModel);
-//        
-//        String cp = complementoPagoBL.obtenerCP(cliente);
-//        ReceiverBindingModel receptor = new ReceiverBindingModel(); 
-//        receptor.setRfc(cliente.getCteRfc());
-//        receptor.setCfdiUse(USO_CFDI);
-//        receptor.setName(cliente.getNombre());
-//        receptor.setFiscalRegime(cliente.getRegimenFiscal().getCd_regimen());
-//        receptor.setTaxZipCode(cp);
-//        cfdi.setReceiver(receptor);
-//        
-//        Complement complements = new Complement();
-//        List<PaymentBindingModel> listPayments = new ArrayList<PaymentBindingModel>();
-//        List<RelatedDocument> listRelatedDocuments;
-//        List<Tax> listTaxes;
-//        for(Pago pago : this.listPagos) {
-//            listRelatedDocuments = new ArrayList<RelatedDocument>();
-//            listTaxes = new ArrayList<Tax>();
-//            PaymentBindingModel payment = new PaymentBindingModel();
-//            Date fechaHora = pago.getFecha();
-//            DateUtil.setTime(fechaHora, pago.getHora().getHour(), pago.getHora().getMinute(), 0);
-//            payment.setDate(fechaHora);
-//            payment.setPaymentForm(pago.getFormaPago());
-//            payment.setAmount(pago.getMonto());
-//            payment.setCurrency(CURRENCY);
-//
-//            DatosPago saldosPago = complementoPagoBL.obtenerSaldos(pago);
-//            RelatedDocument relatedDocument = new RelatedDocument();
-//            relatedDocument.setTaxObject(TAX_OBJECT);
-//            relatedDocument.setUuid(pago.getFactura().getCfdi().getUuid());
-//            relatedDocument.setPartialityNumber(pago.getParcialidad());
-//            relatedDocument.setSerie(pago.getFactura().getNomSerie());
-//            relatedDocument.setFolio(pago.getFactura().getNumero());
-//            relatedDocument.setCurrency(CURRENCY);
-//            relatedDocument.setPaymentMethod(formaPago);
-//            relatedDocument.setPreviousBalanceAmount(saldosPago.getSaldoAnterior());
-//            relatedDocument.setAmountPaid(saldosPago.getMonto());
-//            relatedDocument.setImpSaldoInsoluto(saldosPago.getSaldoRestante());
-//
-//            BigDecimal total = pago.getMonto();
-//            BigDecimal factorIVA = new BigDecimal("1.16");
-//            BigDecimal subtotal = total.divide(factorIVA, 2, RoundingMode.HALF_UP);
-//            BigDecimal iva = total.subtract(subtotal);
-//            BigDecimal rate = new BigDecimal("0.16");
-//            Tax tax = new Tax();
-//            tax.setName(TAX_NAME);
-//            tax.setRate(rate.setScale(2, RoundingMode.HALF_UP));
-//            tax.setTotal(iva);
-//            tax.setBase(subtotal);
-//            tax.setIsRetention(false);
-//            listTaxes.add(tax);
-//
-//            relatedDocument.setTaxes(listTaxes);
-//            listRelatedDocuments.add(relatedDocument);
-//            payment.setRelatedDocuments(listRelatedDocuments);
-//            listPayments.add(payment);
-//        }
-//        complements.setPayments(listPayments);
-//        cfdi.setComplemento(complements);
-//        
-//        CfdiInfoModel registra = cfdiBL.registra(cfdi);
-//        
-//        String idPac             = registra.getId();
-//        String uuid              = registra.getComplement().getTaxStamp().getUuid();
-//        Date   fecha             = DateUtil.getDate(registra.getComplement().getTaxStamp().getDate(),DateUtil.FORMATO_ISO_8601);
-//        String numCertificadoSAT = registra.getComplement().getTaxStamp().getSatCertNumber();
-//        
-//        complementoPago.setTimbrado(fecha);
-//        complementoPago.setIdPac(idPac);
-//        complementoPago.setUuid(uuid);
-//        complementoPago.setCertificadoSAT(numCertificadoSAT);
-//        
-//        complementoPagoDAO.actualizar(complementoPago);
-//    }
-    
     public void sendMail() throws FacturamaException {
         SendMailComplementoPagoBL sendMailBO = null;
         String sContent = null;
@@ -283,6 +189,8 @@ public class ComplementoPagoBL
         
         Adjunto adjunto = null;
         List<Adjunto> alAdjuntos = null;
+        
+        InputStream stream = null;
         try {
             alAdjuntos = new ArrayList<Adjunto>();
             
@@ -294,11 +202,16 @@ public class ComplementoPagoBL
             content = Base64.getDecoder().decode(sContent);
             adjunto = new Adjunto("ComplementoPago_" + complementoPago.getSerie() + "-" + complementoPago.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
             alAdjuntos.add(adjunto);
-
-            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", complementoPago.getIdPac());
-            sContent = filePDF.getContent();
-            content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("ComplementoPago_" + complementoPago.getSerie()+ "-" + complementoPago.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
+            
+            stream = IOTools.toInputStream(content);
+            CFDIv40JR cfdiJR = new CFDIv40JR();
+            String logoPath = "/images/logoF.png";
+            
+            cfdiJR.setLogo(FSTools.getInstance().getResourcePath(logoPath));
+            content = cfdiJR.generarFormatoImpreso(stream);
+            
+            String fileName = String.format("ComplementoPago_%s-%s.pdf", complementoPago.getSerie(), complementoPago.getNumero());
+            adjunto = new Adjunto(fileName, Adjunto.TP_ARCHIVO_PDF, content);
             alAdjuntos.add(adjunto);
             
             sendMailBO = new SendMailComplementoPagoBL(this.complementoPago.getReceptor().getCteCve());
@@ -307,8 +220,10 @@ public class ComplementoPagoBL
             sendMailBO.setAlFiles(alAdjuntos);
             sendMailBO.setLoggedUser(usuario);
             sendMailBO.send();
-        } catch(InventarioException ex) {
+        } catch(Exception ex) {
             log.error("Problema en el envío de correo electrónico de los documentos CFDI...", ex);
+        } finally {
+        	IOTools.close(stream);
         }
     }
     
