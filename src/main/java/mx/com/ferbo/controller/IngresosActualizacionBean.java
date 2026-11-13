@@ -347,8 +347,8 @@ public class IngresosActualizacionBean implements Serializable {
     }
 
     public void deletePago() {
-
-        String mensaje = null;
+    	String title = null;
+        String message = null;
         Severity severity = null;
 
         String respuesta = null;
@@ -362,8 +362,8 @@ public class IngresosActualizacionBean implements Serializable {
             pago = pagoDAO.buscarPorId(this.pagoSelected.getId(), true);
             idFactura = pago.getFactura().getId();
 
-            if (pago.getComplementoPago().getUuid() != null) {
-                throw new InventarioException("Ya no se puede eliminar el pago, ya está asociado con un complemento de pago.");
+            if (pago.getComplementoPago() != null && pago.getComplementoPago().getUuid() != null) {
+                throw new InventarioException("No es posible eliminar el pago porque está asociado con un complemento de pago.");
             }
 
             respuesta = pagoDAO.eliminar(pagoSelected);
@@ -399,19 +399,22 @@ public class IngresosActualizacionBean implements Serializable {
             }
 
             filtraPagos();
-
-            mensaje = "Se eliminado correctamente";
+            
+            title = "Pago eliminado";
+            message = String.format("Se eliminó el pago asociado a la factura %s-%s", pago.getFactura().getNomSerie(), pago.getFactura().getNumero());
             severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
             log.warn("Ocurrió un problema al eliminar el pago...", ex.getMessage());
-            mensaje = ex.getMessage();
-            severity = FacesMessage.SEVERITY_ERROR;
+            title = "Atención";
+            message = ex.getMessage();
+            severity = FacesMessage.SEVERITY_WARN;
         } catch (Exception ex) {
             log.error("Ocurrió un problema al eliminar el pago...", ex);
-            mensaje = "Ocurrio un problema al eliminar el pago.";
+            title = "Error";
+            message = "Ocurrio un problema al eliminar el pago.";
             severity = FacesMessage.SEVERITY_ERROR;
         } finally {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Pago", mensaje));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
             PrimeFaces.current().ajax().update("form:messages");
         }
     }
