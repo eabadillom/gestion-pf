@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ferbo</groupId>
@@ -21,10 +23,49 @@
 	</properties>
 
 	<dependencies>
-        <dependency>
+		<dependency>
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-reports</artifactId>
 			<version>1.6.0-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ferbo.sat</groupId>
+			<artifactId>cfdi40-printer</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ferbo</groupId>
+			<artifactId>facturama-client</artifactId>
+			<version>0.1.6-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ferbo</groupId>
+			<artifactId>gestion-mail</artifactId>
+			<version>0.0.5-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ferbo</groupId>
+			<artifactId>ferbo-tools</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ferbo.bitacora</groupId>
+			<artifactId>ferbo-bitacora</artifactId>
+			<version>1.0.0-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>${zxing.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax</groupId>
@@ -141,6 +182,11 @@
 			<version>1.1.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.25.5</version>
+		</dependency>
+		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
 			<version>2.4.21</version>
@@ -151,9 +197,9 @@
 			<version>6.19.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>net.sf.jasperreports</groupId>
-		    <artifactId>jasperreports-fonts</artifactId>
-		    <version>6.19.0</version>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -161,7 +207,7 @@
 			<version>1.6.2</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
@@ -198,49 +244,16 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
 		<dependency>
-		    <groupId>com.google.code.gson</groupId>
-		    <artifactId>gson</artifactId>
-		    <version>2.10.1</version>
-		</dependency>
-        <dependency>
-            <groupId>org.primefaces.extensions</groupId>
-            <artifactId>primefaces-extensions</artifactId>
-            <version>11.0.6</version>
-        </dependency>
-        <dependency>
-			<groupId>com.ferbo</groupId>
-			<artifactId>facturama-client</artifactId>
-			<version>0.1.6-RELEASE</version>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.10.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.ferbo</groupId>
-			<artifactId>gestion-mail</artifactId>
-			<version>0.0.5-RELEASE</version>
+			<groupId>org.primefaces.extensions</groupId>
+			<artifactId>primefaces-extensions</artifactId>
+			<version>11.0.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.ferbo</groupId>
-  			<artifactId>ferbo-tools</artifactId>
-    		<version>0.1.1-RELEASE</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ferbo.bitacora</groupId>
-  			<artifactId>ferbo-bitacora</artifactId>
-    		<version>1.0.0-RELEASE</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>com.google.zxing</groupId>
-		    <artifactId>core</artifactId>
-		    <version>${zxing.version}</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>com.google.zxing</groupId>
-		    <artifactId>javase</artifactId>
-		    <version>${zxing.version}</version>
-		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -260,9 +273,9 @@
 		<!-- Se establece el nombre del archivo war (gestion.war) -->
 		<finalName>${project.artifactId}</finalName>
 		<resources>
-			   <resource> 
-                 <directory>src/main/resources</directory>  
-             </resource> 
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
 			<resource>
 				<directory>${basedir}/src/main/webapp/WEB-INF</directory>
 				<includes>
@@ -271,10 +284,10 @@
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}</targetPath>
 			</resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
 			<!-- Brutal force to fix -->
 			<resource>
 				<directory>src/main/resources/META-INF</directory>
@@ -307,12 +320,8 @@
 					<webXml>${project.build.directory}/web.xml</webXml>
 				</configuration>
 			</plugin>
-			
-			
-			
-			
-			
-			
+
+
 		</plugins>
 	</build>
 
@@ -516,24 +525,18 @@
 									</includes>
 								</resource>
 							</webResources>
-                            <webResources>
-                                <resource>
-                                    <filtering>true</filtering>
-                                    <directory>src/main/resources</directory>
-                                </resource>
-                            </webResources>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/main/resources</directory>
+								</resource>
+							</webResources>
 							<warSourceDirectory>src/main/webapp</warSourceDirectory>
 							<webXml>${project.build.directory}/web.xml</webXml>
 						</configuration>
 					</plugin>
-                                        <!--<plugin>
-                                            <groupId>org.apache.maven.plugins</groupId>
-                                            <artifactId>maven-resources-plugin</artifactId>
-                                            <version>3.1.0</version>
-                                        </plugin>-->
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-
 </project>
