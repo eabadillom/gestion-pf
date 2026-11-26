@@ -54,6 +54,16 @@
 				<p:column headerText="Receptor">
 					<p:outputLabel value="#{complemento.receptor.nombre}" />
 				</p:column>
+                                <p:column headerText="Total Pagos">
+                                        <p:outputLabel value="#{consultaCPD.getTotalMonto(complemento)}" >
+                                            <f:convertNumber type="currency" currencySymbol="$" />
+                                        </p:outputLabel>
+				</p:column>
+                                <p:column headerText="Fecha de Pago">
+                                        <p:outputLabel value="#{consultaCPD.getFechaPago(complemento)}" >
+                                            <f:convertDateTime locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6"></f:convertDateTime>
+                                        </p:outputLabel>
+				</p:column>
 				<p:column width="1rem;">
 					<i class="#{consultaCPD.editar(complemento) ? 'fas fa-solid fa-award' : ''}" title="Timbrado"/>
 				</p:column>

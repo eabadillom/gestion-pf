@@ -20,6 +20,8 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import com.ferbo.facturama.tools.FacturamaException;
+import java.math.BigDecimal;
+import java.util.Objects;
 
 import mx.com.ferbo.business.ComplementoPagoBL;
 import mx.com.ferbo.business.complemento.ComplementoBL;
@@ -246,6 +248,33 @@ public class ConsultaComplementoPagoBean implements Serializable {
 		this.complemento.getListPagos().remove(pago);
 		pagoDAO.actualizar(pago);
 	}
+        
+        public BigDecimal getTotalMonto(ComplementoPago complementoPago) 
+        {
+            if (complementoPago == null || complementoPago.getListPagos() == null) {
+                return BigDecimal.ZERO;
+            }
+            
+            return complementoPago.getListPagos().stream()
+                .map(Pago::getMonto)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        
+        public Date getFechaPago(ComplementoPago complementoPago) 
+        {
+            if (complementoPago == null || complementoPago.getListPagos() == null) {
+                return null;
+            }
+            
+            List<Date> fechas = complementoPago.getListPagos().stream()
+                .map(Pago::getFecha)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+            
+            return (fechas.size() == 1 || fechas.size() > 1) ? fechas.get(0) : null;
+        }
 	
 	public void actualizar() {
 		String title = null;

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.ComplementoPago;
+import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.util.DAOException;
 
 @Named
@@ -77,8 +78,8 @@ public class ComplementoPagoDAO extends BaseDAO<ComplementoPago, Integer> {
 		EntityManager em = null;
 		try {
 			em = super.getEntityManager();
-			listComplementoPago = em.createNamedQuery("ComplementoPago.findByRegistro", ComplementoPago.class)
-					.setParameter("inicio", inicio).setParameter("fin", fin).getResultList();
+			listComplementoPago = em.createQuery("SELECT DISTINCT cp FROM ComplementoPago cp JOIN FETCH cp.listPagos WHERE cp.registro BETWEEN :inicio AND :fin", ComplementoPago.class)
+					.setParameter("inicio", inicio).setParameter("fin", fin).getResultList();                        
 		} catch (Exception ex) {
 			log.error("Problema al obtener la lista de complementos de pago...", ex);
 			throw new DAOException("Problema al obtener los complementos de pagos");
