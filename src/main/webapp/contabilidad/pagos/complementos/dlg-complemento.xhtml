@@ -6,12 +6,9 @@
 
 			<p:dialog id="dlg-complemento" widgetVar="dlgComplemento" header="Complemento de pago" showEffect="fade" modal="true" responsive="true" fitViewport="true" style="width: 90vw; max-width: 60rem;" position="center top">
 				<p:outputPanel id="pnl-complemento" styleClass="ui-fluid p-grid" >
-					<div class="p-col-12 p-md-12">
-						<p:outputLabel value="EMISOR" style="font-weight: bold;"/>
-					</div>
 					<div class="p-col-6 p-md-6">
 						<div>
-							<p:outputLabel value="Nombre" styleClass="ui-custom-title-small" />
+							<p:outputLabel value="Emisor" styleClass="ui-custom-title-small" />
 						</div>
 						<div class="ui-custom-data">
 							<p:outputLabel value="#{consultaCPD.complemento.emisorNombre}" />
@@ -36,12 +33,14 @@
 					<div class="p-col-6 p-md-2">
 						<p:outputLabel value=""></p:outputLabel>
 					</div>
-					<div class="p-col-12 p-md-12">
-						<p:outputLabel value="RECEPTOR" style="font-weight: bold;"/>
+                                    
+                                        <div class="p-col-12 p-md-12">
+						<p:divider />
 					</div>
+                                    
 					<div class="p-col-6 p-md-6">
 						<div>
-							<p:outputLabel value="Nombre" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
+							<p:outputLabel value="Receptor" style="font-size: 0.8rem; font-weight: bold; color: #495057;"></p:outputLabel>
 						</div>
 						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
 							<p:outputLabel value="#{consultaCPD.complemento.receptorNombre}"></p:outputLabel>
@@ -73,7 +72,7 @@
 					</div>
 					
 					<div class="p-col-12 p-md-12">
-						<p:outputLabel value="DATOS GENERALES" style="font-weight: bold;"/>
+						<p:divider />
 					</div>
 					
 					<div class="p-col-6 p-md-2">
@@ -110,8 +109,16 @@
 							</p:datePicker>
 						</div>
 					</div>
-					<div class="p-col-6 p-md-2">
-					</div>
+                                        <div class="p-col-6 p-md-2">
+                                                <div>
+							<p:outputLabel value="Total de Pagos" style="font-size: 0.8rem; font-weight: bold; color: #495057;" />
+						</div>
+						<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;" >
+							<p:outputLabel value="#{consultaCPD.getTotalMonto(consultaCPD.complemento)}" >
+                                                            <f:convertNumber type="currency" currencySymbol="$" />
+                                                        </p:outputLabel>
+						</div>
+                                        </div>
 					<div class="p-col-6 p-md-2">
 						<div>
 							<p:outputLabel value="." style="font-size: 0.8rem; font-weight: bold; color: rgba(255, 255, 255, 0);" />
