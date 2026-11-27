@@ -54,12 +54,12 @@
 				<p:column headerText="Receptor">
 					<p:outputLabel value="#{complemento.receptor.nombre}" />
 				</p:column>
-                                <p:column headerText="Total Pagos">
+                                <p:column headerText="Total Pagos" width="6rem" style="text-align: right;">
                                         <p:outputLabel value="#{consultaCPD.getTotalMonto(complemento)}" >
-                                            <f:convertNumber type="currency" currencySymbol="$" />
+                                            <f:convertNumber type="currency" pattern="$ #,###,##0.00" />
                                         </p:outputLabel>
 				</p:column>
-                                <p:column headerText="Fecha de Pago">
+                                <p:column headerText="Fecha de Pago" width="6rem" style="text-align: center;" >
                                         <p:outputLabel value="#{consultaCPD.getFechaPago(complemento)}" >
                                             <f:convertDateTime locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6"></f:convertDateTime>
                                         </p:outputLabel>
